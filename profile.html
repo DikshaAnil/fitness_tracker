@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        .dashboard {
+            background: rgba(0, 0, 0, 0.85);
+            width: 500px;
+            max-width: 95%;
+            margin: 60px auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+            text-align: center;
+        }
+        .dashboard h2 {
+            font-size: 26px;
+            color: #ffcc00;
+            margin-bottom: 20px;
+        }
+        .profile-pic {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 4px solid #ff6600;
+        }
+        label {
+            display: block;
+            text-align: left;
+            margin-top: 12px;
+            color: #ffcc00;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border-radius: 8px;
+            border: none;
+        }
+        button {
+            width: 100%;
+            margin-top: 18px;
+            padding: 14px;
+            background: linear-gradient(45deg, #ff6600, #ff3300);
+            border: none;
+            color: white;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .success {
+            background: #28a745;
+            color: white;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- 🔐 Login Protection -->
+<script>
+    const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
+    if (!loggedUser) {
+        window.location.href = "login.html";
+    }
+</script>
+
+<!-- Navbar -->
+<div class="navbar">
+    <div class="logo"><img src="images/logo.png" alt="Logo"></div>
+    <div class="nav-links">
+        <a href="main.html">Home</a>
+        <a href="profile.html">Profile</a>
+        <a href="#" onclick="logout()">Logout</a>
+    </div>
+</div>
+
+<div class="dashboard">
+    <h2 id="welcome"></h2>
+    <div id="successMsg"></div>
+
+    <img id="profilePic" class="profile-pic" src="images/default.png">
+
+    <form id="profileForm">
+        <label>Change Username</label>
+        <input type="text" id="username" required>
+
+        <label>Change Password</label>
+        <input type="password" id="password">
+
+        <label>Profile Picture</label>
+        <input type="file" id="profileInput" accept="image/*">
+
+        <label>Bio</label>
+        <textarea id="bio" rows="3"></textarea>
+
+        <button type="submit">Update Profile</button>
+    </form>
+</div>
+
+<footer>
+    <p>&copy; 2025 Fitness Project. All Rights Reserved.</p>
+</footer>
+
+<script>
+/* ---------------- DATA INIT ---------------- */
+const profiles = JSON.parse(localStorage.getItem("userProfiles")) || {};
+const email = loggedUser.email;
+
+if (!profiles[email]) {
+    profiles[email] = {
+        username: email,
+        password: loggedUser.password || "",
+        bio: "Hey! I'm new here 👋",
+        profilePic: "images/default.png"
+    };
+}
+
+const user = profiles[email];
+
+/* ---------------- LOAD DATA ---------------- */
+document.getElementById("welcome").innerText = `Welcome, ${user.username} 👋`;
+document.getElementById("username").value = user.username;
+document.getElementById("bio").value = user.bio;
+document.getElementById("profilePic").src = user.profilePic;
+
+/* ---------------- IMAGE UPLOAD ---------------- */
+document.getElementById("profileInput").addEventListener("change", function () {
+    const file = this.files[0];
+    const reader = new FileReader();
+    reader.onload = () => {
+        user.profilePic = reader.result;
+        document.getElementById("profilePic").src = reader.result;
+    };
+    reader.readAsDataURL(file);
+});
+
+/* ---------------- UPDATE PROFILE ---------------- */
+document.getElementById("profileForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    user.username = document.getElementById("username").value.trim();
+    user.bio = document.getElementById("bio").value.trim();
+
+    const newPassword = document.getElementById("password").value.trim();
+    if (newPassword) user.password = newPassword;
+
+    profiles[email] = user;
+    localStorage.setItem("userProfiles", JSON.stringify(profiles));
+
+    document.getElementById("successMsg").innerHTML =
+        `<div class="success">Profile updated successfully ✅</div>`;
+});
+
+/* ---------------- LOGOUT ---------------- */
+function logout() {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "login.html";
+}
+</script>
+
+</body>
+</html>

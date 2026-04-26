@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Fitness Route - Fitness Tracker</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            font-family: "Poppins", sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            background: rgba(0,0,0,0.8);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        h2 {
+            color: #ff914d;
+            margin-bottom: 20px;
+        }
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: none;
+            font-size: 15px;
+        }
+        button {
+            background: #ff914d;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        button:hover {
+            background: #e67e22;
+        }
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: block;
+        }
+        .body-type {
+            display: inline-block;
+            width: 28%;
+            margin: 1%;
+            text-align: center;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .body-type.selected {
+            border-color: #ff914d;
+            box-shadow: 0 0 15px rgba(255,145,77,0.7);
+        }
+        .body-type img {
+            width: 100%;
+            border-radius: 10px;
+        }
+        .progressbar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            counter-reset: step;
+        }
+        .progressbar li {
+            list-style: none;
+            text-align: center;
+            position: relative;
+            flex: 1;
+            color: #aaa;
+        }
+        .progressbar li:before {
+            counter-increment: step;
+            content: counter(step);
+            width: 35px;
+            height: 35px;
+            line-height: 35px;
+            border: 2px solid #aaa;
+            display: block;
+            margin: 0 auto 10px;
+            border-radius: 50%;
+            background: white;
+            color: black;
+        }
+        .progressbar li.active {
+            color: #ff914d;
+        }
+        .progressbar li.active:before {
+            border-color: #ff914d;
+        }
+        .plans h3 {
+            color: #ff914d;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- 🔐 LOGIN PROTECTION -->
+<script>
+    const loggedUser = JSON.parse(localStorage.getItem("loggedInUser"));
+    if (!loggedUser) {
+        window.location.href = "login.html";
+    }
+</script>
+
+<div class="container">
+
+    <!-- Progress Bar -->
+    <ul class="progressbar">
+        <li class="active">Your Info</li>
+        <li>Body Type</li>
+        <li>Plan</li>
+    </ul>
+
+    <!-- STEP 1 -->
+    <div class="step active" id="step1">
+        <h2>Step 1: Enter Your Details</h2>
+        <input type="text" id="name" placeholder="Full Name" required>
+        <input type="number" id="age" placeholder="Age" required>
+        <input type="number" id="height" placeholder="Height (cm)" required>
+        <input type="number" id="weight" placeholder="Weight (kg)" required>
+        <button onclick="nextStep(1)">Next</button>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step" id="step2">
+        <h2>Step 2: Choose Your Goal Body Type</h2>
+
+        <div class="body-type" onclick="selectBodyType(this, 'Lean')">
+            <img src="fitness-tracker-main\images\lean.png">
+            <p><b>Lean</b><br>Fat loss & cardio</p>
+        </div>
+
+        <div class="body-type" onclick="selectBodyType(this, 'Muscular')">
+            <img src="images\bulk.png">
+            <p><b>Bulk</b><br>Strength & hypertrophy</p>
+        </div>
+
+        <div class="body-type" onclick="selectBodyType(this, 'Athletic')">
+            <img src="fitness-tracker-main\images\athletic.png">
+            <p><b>Athletic</b><br>Balanced fitness</p>
+        </div>
+
+        <button onclick="goToPlan()">Next</button>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step" id="step3">
+        <h2>Your Customized Plan</h2>
+        <div class="plans" id="plansContent"></div>
+        <button onclick="finishPlan()">Finish & Go to Dashboard</button>
+    </div>
+
+</div>
+
+<script>
+    let bodyType = "";
+    let userData = {};
+
+    function nextStep(step) {
+        document.getElementById("step" + step).classList.remove("active");
+        document.getElementById("step" + (step + 1)).classList.add("active");
+        document.querySelectorAll(".progressbar li")[step].classList.add("active");
+    }
+
+    function selectBodyType(element, type) {
+        document.querySelectorAll(".body-type").forEach(el => el.classList.remove("selected"));
+        element.classList.add("selected");
+        bodyType = type;
+    }
+
+    function goToPlan() {
+        if (!bodyType) {
+            alert("Please select a body type!");
+            return;
+        }
+        nextStep(2);
+        generatePlan();
+    }
+
+    function generatePlan() {
+        let content = "";
+
+        if (bodyType === "Lean") {
+            content = `
+                <h3>Workout Plan (Lean)</h3>
+                <ul>
+                    <li>Cardio: 30–40 min daily</li>
+                    <li>Light strength training</li>
+                    <li>Core workouts</li>
+                </ul>
+                <h3>Diet Plan</h3>
+                <ul>
+                    <li>High protein</li>
+                    <li>Low carbs</li>
+                    <li>Hydration focused</li>
+                </ul>`;
+        } 
+        else if (bodyType === "Muscular") {
+            content = `
+                <h3>Workout Plan (Muscular)</h3>
+                <ul>
+                    <li>Weight training 5x/week</li>
+                    <li>Compound lifts</li>
+                    <li>Progressive overload</li>
+                </ul>
+                <h3>Diet Plan</h3>
+                <ul>
+                    <li>High protein</li>
+                    <li>Complex carbs</li>
+                    <li>Healthy fats</li>
+                </ul>`;
+        } 
+        else {
+            content = `
+                <h3>Workout Plan (Athletic)</h3>
+                <ul>
+                    <li>Strength + cardio balance</li>
+                    <li>Mobility & flexibility</li>
+                    <li>Agility training</li>
+                </ul>
+                <h3>Diet Plan</h3>
+                <ul>
+                    <li>Balanced nutrition</li>
+                    <li>Lean protein</li>
+                    <li>Good hydration</li>
+                </ul>`;
+        }
+
+        document.getElementById("plansContent").innerHTML = content;
+    }
+
+    function finishPlan() {
+        userData = {
+            name: document.getElementById("name").value,
+            age: document.getElementById("age").value,
+            height: document.getElementById("height").value,
+            weight: document.getElementById("weight").value,
+            bodyType: bodyType
+        };
+
+        localStorage.setItem("fitnessUserData", JSON.stringify(userData));
+        window.location.href = "main.html";
+    }
+</script>
+
+</body>
+</html>
