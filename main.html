@@ -105,7 +105,7 @@ document.getElementById("dailyGoalSection").innerHTML = `
 /* ---------------- BADGES ---------------- */
 const badges = [];
 if (todayBurned >= dailyGoal) badges.push("✅ Daily Goal Achieved");
-if (streak >= 7) badges.push("💪 7-Day Streak");
+if (streak >= 7) badges.push("💪 15-Day Streak");
 if (todayBurned > 1000) badges.push("🔥 1000 Calories in a Day");
 
 const badgeContainer = document.getElementById("badges");
@@ -124,7 +124,7 @@ if (badges.length > 0) {
 /* ---------------- LEADERBOARD ---------------- */
 const leaderboardData = [
     { name: userEmail, points: Math.floor(Math.random() * 1000) + 1000 },
-    { name: "Rahul", points: 1200 },
+    { name: "Raj", points: 1200 },
     { name: "Ananya", points: 1000 }
 ];
 
